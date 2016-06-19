@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/angular-local-storage/dist/angular-local-storage.js"></script>
+    
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+  </head>
+  <body ng-app="ToDo" ng-controller="main" ng-init="getTasks()">
+
+    <ion-pane>
+      <ion-header-bar class="bar-dark">
+        <h1 class="title">To Do</h1>
+          <div class="buttons">
+            <!-- DoFunction Button -->
+            <button class="button button-icon" ng-click="doFunction()">
+              <i class="icon ion-settings"></i>
+            </button>
+            <!-- New Task Button -->
+            <button class="button button-icon" ng-click="openTaskModal()">
+              <i class="icon ion-compose"></i>
+            </button>
+          </div>
+      </ion-header-bar>
+
+      <ion-content>
+        <ion-refresher pulling-text="Pull to refresh" on-refresh="getTasks()"></ion-refresher>
+        <div class="card">
+          <div class="item item-divider">
+            <input class="quickTaskBar" ng-model="task.title" type="text" style="width:90%" placeholder="Add a task">
+            <i class="addTaskIcon ion-plus-round" ng-click="createQuickTask()"></i>
+          </div>
+        </div>
+
+        <div class="mainDate">{{CurrentDate | date:&quot;dd MMMM yyyy&quot; }}
+          <button class="sortButton" ng-click="sortTasks()">
+          <i ng-if="sortAttribute == &apos;$index&apos;" class="icon ion-minus-round"></i>
+          <i ng-if="sortAttribute == &apos;expDate&apos;" class="icon ion-arrow-down-b"></i>
+          <i ng-if="sortAttribute == &apos;-expDate&apos;" class="icon ion-arrow-up-b"></i>
+          </button>
+        </div>
+
+        <div class="list card" ng-repeat="task in tasks | orderBy:sortAttribute" can-swipe="true" on-swipe-left="removeTask(task.id)" on-swipe-right="removeTask(task.id)">
+            <div class="item item-divider">
+              <strong><span ng-bind="task.title"></span></strong>
+              <span class="taskExpDate" ng-show="task.expDate"><span style="color:red" ng-if="task.due">Due </span>{{task.expDate | date:&quot;dd-MM-yyyy&quot;}}</span>
+              <i class="iconsmall ion-close-round" ng-click="removeTask(task.id)"></i>
+            </div>
+            <div class="item item-body" ng-show="task.content">
+              <span ng-bind="task.content"></span>
+            </div>
+        </div>
+      </ion-content>
+    </ion-pane>
+
+    <script id="new-task-modal.html" type="text/ng-template">
+      <ion-modal-view>
+        <ion-header-bar class="bar-dark">
+          <h1 class="title">New Task</h1>
+          <button class="button button-icon" ng-click="closeTaskModal()">
+            <i class="icon ion-android-close"></i>
+          </button>
+        </ion-header-bar>
+        <ion-content>
+          <form ng-submit="createTask()">
+            <div class="list list-inset">
+              <label class="item item-input">Title:&nbsp
+                <input ng-model="task.title" type="text" placeholder="Title required" required>
+              </label>
+              <label class="item item-input">DueDate:&nbsp
+                <input ng-model="task.expDate" type="date">
+              </label>
+              <label class="item item-input">Comments:&nbsp
+                <textarea ng-model="task.content" rows="5" type="text"></textarea>
+              </label>
+              <button type="submit" class="button button-block createTaskButton">Create Task</button>
+            </div>
+          </form>
+        </ion-content>
+      </ion-modal-view>
+    </script>
+
+  </body>
+</html>
